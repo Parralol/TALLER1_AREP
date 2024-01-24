@@ -1,10 +1,15 @@
 package edu.escuelaing.arem.ASE.app;
 
 import java.net.*;
+import java.util.List;
+import java.util.Scanner;
 import java.io.*;
 
 public class HttpServer {
     public static void main(String[] args) throws IOException {
+        String key = "&apikey=b5ed8d05";
+        String url = "http://www.omdbapi.com/?s=";
+       
         boolean hasprint = false;
         ServerSocket serverSocket = null;
         try {
@@ -15,6 +20,7 @@ public class HttpServer {
         }
         boolean running = true;
         while (running) {
+            
             Socket clientSocket = null;
             try {
                 System.out.println("Listo para recibir ...");
@@ -29,13 +35,24 @@ public class HttpServer {
                     new InputStreamReader(
                             clientSocket.getInputStream()));
             String inputLine, outputLine;
+            int count = 0;
+            String request="";
 
             while ((inputLine = in.readLine()) != null) {
+                if(count == 0){
+                    request = inputLine;
+                    request = getQuery(request);
+                    System.out.println(request);
+
+                    count +=1;
+                }
+                
                 System.out.println("Received: " + inputLine);
                 if (!in.ready()) {
                     break;
                 }
             }
+            
             if(!hasprint){
             outputLine = "HTTP/1.1 200 OK"
                     + "Content-Type:text/html; charset=ISO-8859-1\r\n"
@@ -92,10 +109,47 @@ public class HttpServer {
             out.println(outputLine);
             hasprint = true;
             }
+            String[] requests = request.split("=");
+            String defurl = url + requests[1]+key;
+            System.out.println(defurl);
+            URL api = new URL(defurl);
+            try{
+                HttpURLConnection connection = (HttpURLConnection) api.openConnection();
+                connection.setRequestMethod("GET");
+                connection.connect();
+                int responsecode = connection.getResponseCode();
+                System.out.println("CONNECTION STATUS" + "----->  " + responsecode);
+                String inline = "";
+                Scanner scanner = new Scanner(api.openStream());
+                
+                while (scanner.hasNext()) {
+                    inline += scanner.nextLine();
+                }
+                scanner.close();
+                System.out.println(inline);
+            }catch(IOException e){
+                    System.out.println(e.getMessage());
+            }
             out.close();
             in.close();
             clientSocket.close();
         }
         serverSocket.close();
+    }
+
+    /**
+     * Allows to split the GET or POST request just to get the query
+     * @param text
+     * @return
+     */
+    private static String getQuery(String text){
+        String[] deco1 = text.split(" ");
+        String[] deco2 = deco1[1].split("\\?");
+        if(deco2.length >=2){
+            String[] deco3 = deco2[1].split("\\#");
+            return deco3[0];
+        }else{
+            return deco2[0];
+        }
     }
 }
