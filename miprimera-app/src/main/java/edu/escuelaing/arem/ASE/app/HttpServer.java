@@ -7,10 +7,9 @@ import java.io.*;
 
 public class HttpServer {
     static String key = "&apikey=b5ed8d05";
-    static String url = "http://www.omdbapi.com/?s=";
+    static String url = "http://www.omdbapi.com/?t=";
     public static void main(String[] args) throws IOException {
 
-       
         boolean hasprint = false;
         ServerSocket serverSocket = null;
         try {
@@ -52,6 +51,7 @@ public class HttpServer {
                     break;
                 }
             }
+            out.println("");
             if(!hasprint){
             outputLine = "HTTP/1.1 200 OK"
                     + "Content-Type:text/html; charset=ISO-8859-1\r\n"
@@ -108,8 +108,13 @@ public class HttpServer {
                 out.println(outputLine);
                 hasprint = true;
             }
-            String inline = getJson(request);
-            System.out.println(inline);
+            if(hasprint){
+                String inline = getJson(request);
+                System.out.println(inline);
+                out.println(inline);
+            }
+            out.flush();
+            
             out.close();
             in.close();
             clientSocket.close();
@@ -140,29 +145,29 @@ public class HttpServer {
      */
     private static String getJson(String request){
         String[] requests = request.split("=");
-            String defurl = url + requests[1]+key;
-            System.out.println(defurl);
-            String res ="";
-            try{
-                URL api = new URL(defurl);
-                HttpURLConnection connection = (HttpURLConnection) api.openConnection();
-                connection.setRequestMethod("GET");
-                connection.connect();
-                int responsecode = connection.getResponseCode();
-                System.out.println("CONNECTION STATUS" + "----->  " + responsecode);
-                String inline = "";
-                Scanner scanner = new Scanner(api.openStream());
+        String defurl = url + requests[1]+key;
+        System.out.println(defurl);
+        String res ="";
+        try{
+            URL api = new URL(defurl);
+            HttpURLConnection connection = (HttpURLConnection) api.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+            int responsecode = connection.getResponseCode();
+            System.out.println("CONNECTION STATUS" + "----->  " + responsecode);
+            String inline = "";
+            Scanner scanner = new Scanner(api.openStream());
                 
-                while (scanner.hasNext()) {
-                    inline += scanner.nextLine();
-                }
-                scanner.close();
-                res = inline;
-                
-            }catch(IOException e){
-                    System.out.println(e.getMessage());
+            while (scanner.hasNext()) {
+                inline += scanner.nextLine();
             }
-            return res;
+            scanner.close();
+            res = inline;
+                
+        }catch(IOException e){
+                    System.out.println(e.getMessage());
+        }
+        return res;
         
     }
 }
