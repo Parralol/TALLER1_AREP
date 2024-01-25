@@ -3,12 +3,13 @@ package edu.escuelaing.arem.ASE.app;
 import java.net.*;
 import java.util.List;
 import java.util.Scanner;
-import java.io.*;
+import java.io.*; 
 
 public class HttpServer {
+    static String key = "&apikey=b5ed8d05";
+    static String url = "http://www.omdbapi.com/?s=";
     public static void main(String[] args) throws IOException {
-        String key = "&apikey=b5ed8d05";
-        String url = "http://www.omdbapi.com/?s=";
+
        
         boolean hasprint = false;
         ServerSocket serverSocket = null;
@@ -20,7 +21,6 @@ public class HttpServer {
         }
         boolean running = true;
         while (running) {
-            
             Socket clientSocket = null;
             try {
                 System.out.println("Listo para recibir ...");
@@ -52,7 +52,6 @@ public class HttpServer {
                     break;
                 }
             }
-            
             if(!hasprint){
             outputLine = "HTTP/1.1 200 OK"
                     + "Content-Type:text/html; charset=ISO-8859-1\r\n"
@@ -106,30 +105,11 @@ public class HttpServer {
                     "        </script>\r\n" + //
                     "    </body>\r\n" + //
                     "</html>" + inputLine;
-            out.println(outputLine);
-            hasprint = true;
+                out.println(outputLine);
+                hasprint = true;
             }
-            String[] requests = request.split("=");
-            String defurl = url + requests[1]+key;
-            System.out.println(defurl);
-            URL api = new URL(defurl);
-            try{
-                HttpURLConnection connection = (HttpURLConnection) api.openConnection();
-                connection.setRequestMethod("GET");
-                connection.connect();
-                int responsecode = connection.getResponseCode();
-                System.out.println("CONNECTION STATUS" + "----->  " + responsecode);
-                String inline = "";
-                Scanner scanner = new Scanner(api.openStream());
-                
-                while (scanner.hasNext()) {
-                    inline += scanner.nextLine();
-                }
-                scanner.close();
-                System.out.println(inline);
-            }catch(IOException e){
-                    System.out.println(e.getMessage());
-            }
+            String inline = getJson(request);
+            System.out.println(inline);
             out.close();
             in.close();
             clientSocket.close();
@@ -151,5 +131,38 @@ public class HttpServer {
         }else{
             return deco2[0];
         }
+    }
+
+    /**
+     * Permite recibir el Json que se esta buscando
+     * @param request
+     * @return
+     */
+    private static String getJson(String request){
+        String[] requests = request.split("=");
+            String defurl = url + requests[1]+key;
+            System.out.println(defurl);
+            String res ="";
+            try{
+                URL api = new URL(defurl);
+                HttpURLConnection connection = (HttpURLConnection) api.openConnection();
+                connection.setRequestMethod("GET");
+                connection.connect();
+                int responsecode = connection.getResponseCode();
+                System.out.println("CONNECTION STATUS" + "----->  " + responsecode);
+                String inline = "";
+                Scanner scanner = new Scanner(api.openStream());
+                
+                while (scanner.hasNext()) {
+                    inline += scanner.nextLine();
+                }
+                scanner.close();
+                res = inline;
+                
+            }catch(IOException e){
+                    System.out.println(e.getMessage());
+            }
+            return res;
+        
     }
 }
