@@ -11,7 +11,7 @@ Lo unico que necesitas para extender la funcionalidad de este programa es que ag
 
 ### Diseño
 
-  Este programa sigue el Principio Open/Closed, ya que no es un proyecto lo suficientemente grande para aplicar todo el principio SOLID
+  Este programa sigue el Principio Open/Closed, ya que no es un proyecto lo suficientemente grande para aplicar todo el principio SOLID, se usa el patron builder ya que se construye procedimentalmente una clase compleja a base de pasos pequeños y simples.
   
 ### Prerequisitos
 
