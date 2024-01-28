@@ -3,7 +3,6 @@ package edu.escuelaing.arem.ASE.app;
 import java.net.*;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.io.*; 
@@ -56,7 +55,6 @@ public class HttpServer {
                 }
             }
             out.println("");
-            System.out.print(path);
             if(path.equals("/cliente") || "/favicon.ico" == path){
                 outputLine = "HTTP/1.1 200 OK"
                         + "Content-Type:text/html; charset=ISO-8859-1\r\n"
@@ -182,6 +180,11 @@ public class HttpServer {
         return res;
     }
 
+    /**
+     * returns the path that the current user is using
+     * @param request
+     * @return
+     */
     private static String getPath(String request){
         String[] deco1 = request.split(" ");
         String[] deco2 = deco1[1].split("\\?");
